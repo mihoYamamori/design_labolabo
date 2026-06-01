@@ -68,10 +68,10 @@ const PAGE_CONFIG = {
       ],
       'スコア': [
         { id:'csa_score',  label:'CSA Score',           type:'numeric',        min:0,  max:100 },
-        { id:'yoy_csa',    label:'Y-o-Y of CSA Score',  type:'checkbox-color', options:[{v:'up_c',  label:'上がった項目↑', color:'#2e7d32'},{v:'down_c', label:'下がった項目↓', color:'#c62828'},{v:'same_c', label:'同じ', color:''}] },
+        { id:'yoy_csa',    label:'Y-o-Y of CSA Score',  type:'checkbox-color', options:[{v:'up_c',  label:'上がった項目↑', color:'#388e3c'},{v:'down_c', label:'下がった項目↓', color:'#d32f2f'},{v:'same_c', label:'同じ', color:''}] },
         { id:'esg_score',  label:'ESG Score',            type:'numeric',        min:0,  max:100 },
         { id:'percentile', label:'Percentile',           type:'numeric',        min:0,  max:100 },
-        { id:'yoy_pct',    label:'Y-o-Y of Percentile', type:'checkbox-color', options:[{v:'up_p',  label:'上がった項目↑', color:'#2e7d32'},{v:'down_p', label:'下がった項目↓', color:'#c62828'},{v:'same_p', label:'同じ', color:''}] },
+        { id:'yoy_pct',    label:'Y-o-Y of Percentile', type:'checkbox-color', options:[{v:'up_p',  label:'上がった項目↑', color:'#388e3c'},{v:'down_p', label:'下がった項目↓', color:'#d32f2f'},{v:'same_p', label:'同じ', color:''}] },
         { id:'weight',     label:'Weight(%)',             type:'numeric',        min:0,  max:100 },
         { id:'importance', label:'重要度',               type:'checkbox',       options:[{v:'5',label:'5'},{v:'4',label:'4'},{v:'3',label:'3'},{v:'2',label:'2'},{v:'1',label:'1'}] },
       ],
@@ -98,7 +98,7 @@ const PAGE_CONFIG = {
       ],
       'スコア': [
         { id:'resp_f',        label:'レスポンス', type:'checkbox',       options:[{v:'null_f',label:'NULL'},{v:'na_f',label:'Not Applicable'},{v:'text_f',label:'Text'},{v:'kaizen_f',label:'改善余地がある'}] },
-        { id:'diff_f',        label:'差分',       type:'checkbox-color', options:[{v:'up_f',label:'アップ↑',color:'#2e7d32'},{v:'down_f',label:'ダウン↓',color:'#c62828'},{v:'stay_f',label:'ステイ→',color:'#1565c0'}] },
+        { id:'diff_f',        label:'差分',       type:'checkbox-color', options:[{v:'up_f',label:'アップ↑',color:'#388e3c'},{v:'down_f',label:'ダウン↓',color:'#d32f2f'},{v:'stay_f',label:'ステイ→',color:'#039be5'}] },
         { id:'rebuttal_eff_f',label:'反論効果',   type:'checkbox',       options:[{v:'ari_f',label:'あり'},{v:'nashi_f',label:'なし'}], note:'反論後のみ表示' },
         { id:'imp_f',         label:'重要度',     type:'checkbox',       options:[{v:'5f',label:'5'},{v:'4f',label:'4'},{v:'3f',label:'3'},{v:'2f',label:'2'},{v:'1f',label:'1'}] },
       ],
@@ -123,7 +123,7 @@ const PAGE_CONFIG = {
       ],
       'スコア': [
         { id:'score_m', label:'スコア', type:'numeric',        min:0, max:10 },
-        { id:'diff_m',  label:'差分',   type:'checkbox-color', options:[{v:'up_m',label:'アップ↑',color:'#2e7d32'},{v:'down_m',label:'ダウン↓',color:'#c62828'},{v:'stay_m',label:'ステイ→',color:'#1565c0'}] },
+        { id:'diff_m',  label:'差分',   type:'checkbox-color', options:[{v:'up_m',label:'アップ↑',color:'#388e3c'},{v:'down_m',label:'ダウン↓',color:'#d32f2f'},{v:'stay_m',label:'ステイ→',color:'#039be5'}] },
         { id:'imp_m',   label:'重要度', type:'checkbox',       options:[{v:'5m',label:'5'},{v:'4m',label:'4'},{v:'3m',label:'3'},{v:'2m',label:'2'},{v:'1m',label:'1'}] },
       ],
       '運用管理': [
@@ -344,23 +344,28 @@ function KeywordControl({ f, state, setState }) {
   const val = state[f.id] || '';
   const set = v => setState(s => ({ ...s, [f.id]: v }));
   return (
-    <Box sx={{ display:'flex', alignItems:'center', gap:1 }}>
-      <TextField
-        fullWidth
-        size="small"
-        label="キーワード検索"
-        value={val}
-        onChange={e => set(e.target.value)}
-        sx={{ fontSize:13, '& .MuiInputBase-input':{ fontSize:13 } }}
-      />
-      {val && (
-        <Tooltip title="クリア">
-          <IconButton size="small" onClick={() => set('')} sx={{ color:'text.disabled', flexShrink:0 }}>
-            <span className="material-icons" style={{ fontSize:18 }}>close</span>
-          </IconButton>
-        </Tooltip>
-      )}
-    </Box>
+    <TextField
+      fullWidth
+      size="small"
+      placeholder="キーワード検索"
+      value={val}
+      onChange={e => set(e.target.value)}
+      InputProps={{
+        endAdornment: val ? (
+          <InputAdornment position="end">
+            <IconButton
+              size="small"
+              onMouseDown={e => e.preventDefault()}
+              onClick={() => set('')}
+              sx={{ color:'text.disabled', p:0.25 }}
+            >
+              <span className="material-icons" style={{ fontSize:18 }}>close</span>
+            </IconButton>
+          </InputAdornment>
+        ) : null,
+      }}
+      sx={{ fontSize:13, '& .MuiInputBase-input':{ fontSize:13 } }}
+    />
   );
 }
 
@@ -415,17 +420,11 @@ function CheckboxColorControl({ f, state, setState }) {
               size="small"
               checked={selected.includes(opt.v)}
               onChange={e => toggle(opt.v, e.target.checked)}
-              sx={opt.color ? {
-                color: opt.color,
-                '&.Mui-checked': { color: opt.color },
-              } : { color:'text.secondary' }}
+              color="primary"
             />
           }
           label={
-            <Typography
-              variant="body1"
-              sx={{ fontSize:13, color: opt.color || 'text.primary', fontWeight: opt.color ? 500 : 400 }}
-            >
+            <Typography variant="body1" sx={{ fontSize:13, color: opt.color || 'text.primary' }}>
               {opt.label}
             </Typography>
           }
@@ -436,7 +435,7 @@ function CheckboxColorControl({ f, state, setState }) {
   );
 }
 
-// ===== ③ Numeric filter =====
+
 function NumericControl({ f, state, setState }) {
   const val = state[f.id] || { min:'', max:'' };
   const set = (k, v) => setState(s => ({ ...s, [f.id]: { ...val, [k]: v } }));
@@ -449,23 +448,23 @@ function NumericControl({ f, state, setState }) {
         <TextField
           size="small"
           type="number"
-          label={`最小値入力（最小${f.min ?? ''}）`}
+          placeholder={`最小値（最小${f.min ?? ''}）`}
           value={val.min}
           onChange={e => set('min', e.target.value)}
           error={err}
           inputProps={{ min: f.min, max: f.max }}
-          sx={{ flex:1, '& .MuiInputBase-input':{ fontSize:13 }, '& .MuiInputLabel-root':{ fontSize:13 } }}
+          sx={{ flex:1, '& .MuiInputBase-input':{ fontSize:13 } }}
         />
         <Typography variant="body2" color="text.secondary" sx={{ flexShrink:0 }}>〜</Typography>
         <TextField
           size="small"
           type="number"
-          label={`最大値入力（最大${f.max ?? ''}）`}
+          placeholder={`最大値（最大${f.max ?? ''}）`}
           value={val.max}
           onChange={e => set('max', e.target.value)}
           error={err}
           inputProps={{ min: f.min, max: f.max }}
-          sx={{ flex:1, '& .MuiInputBase-input':{ fontSize:13 }, '& .MuiInputLabel-root':{ fontSize:13 } }}
+          sx={{ flex:1, '& .MuiInputBase-input':{ fontSize:13 } }}
         />
       </Box>
       {err && (
